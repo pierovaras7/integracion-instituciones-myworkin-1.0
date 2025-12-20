@@ -13,13 +13,24 @@ router = APIRouter()
 # ULIMA
 # -------------------------------------------------
 @router.post("/students/ulima")
-@limiter.limit("10/minute")
-def register_ulima_student(
+@limiter.limit("100/minute")
+async def register_ulima_student(
     request: Request,
     body: StudentULimaDTO
 ):
-    uc = register_student_use_case()
-    return {"status": uc.execute(ulima_to_domain(body))}
+    try:
+        uc = register_student_use_case()
+        result = uc.execute(ulima_to_domain(body))
+        return {"status": result}
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return {
+            "error": str(e),
+            "type": type(e).__name__
+        }
+
 
 # -------------------------------------------------
 # UCV
